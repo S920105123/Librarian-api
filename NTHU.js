@@ -7,9 +7,6 @@ const BaseUrl = 'http://localhost:8080/api/NTHU';
 // Staging server URL
 // const BaseUrl = 'http://weathermood-staging.us-west-2.elasticbeanstalk.com/api/NTHU';
 
-const byISBN=0;
-const byName=1;
-
 export function getBookNTHU(searchText, type) {
     // For test
     //type=0;
@@ -20,7 +17,7 @@ export function getBookNTHU(searchText, type) {
         return;
     }
     let url = `${BaseUrl}`;
-    if (type===byISBN)
+    if (type==="isbn")
         url+="/ISBN?searchText=";
     else
         url+="/book?searchText=";
