@@ -85,7 +85,7 @@ export function getBookNTHU(searchText, type) {
                 subStr+=data.charAt(j);
                 j++;
             }
-            result[i]['location'] = [subStr];
+            result[i]['location'] = ["清華大學圖書館 - "+subStr];
             //console.log("Location =",subStr);
 
             idx = data.indexOf(titleFlag);
@@ -99,7 +99,7 @@ export function getBookNTHU(searchText, type) {
                     subStr+=data.charAt(j);
                     j++;
                 }
-                result[i]['location'].push(subStr);
+                result[i]['location'].push("清華大學圖書館 - "+subStr);
                 //console.log("Location =",subStr);
             }
 
