@@ -85,6 +85,12 @@ export function getBookNTHU(searchText, type) {
                 subStr+=data.charAt(j);
                 j++;
             }
+
+            let temp = subStr.indexOf("(");
+            if (temp!=-1) {
+                result[i]['status'] = ["館藏/借出: " + subStr.slice(temp)];
+                subStr = subStr.slice(0,temp);
+            }
             result[i]['location'] = ["清華大學圖書館 - "+subStr];
             //console.log("Location =",subStr);
 
@@ -98,6 +104,12 @@ export function getBookNTHU(searchText, type) {
                 while (data.charAt(j)!=='<') {
                     subStr+=data.charAt(j);
                     j++;
+                }
+
+                temp = subStr.indexOf("(");
+                if (temp!=-1) {
+                    result[i]['status'].push("館藏/借出: " + subStr.slice(temp));
+                    subStr = subStr.slice(0,temp-1);
                 }
                 result[i]['location'].push("清華大學圖書館 - "+subStr);
                 //console.log("Location =",subStr);
