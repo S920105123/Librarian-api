@@ -12,8 +12,8 @@ const byName=1;
 
 export function getBookNTHU(searchText, type) {
     // For test
-    type=0;
-    searchText='123';
+    //type=0;
+    //searchText='123';
 
     if (!searchText || !searchText.trim()) {
         console.error("Error getting book - searchText cannot be empty.");
@@ -24,7 +24,7 @@ export function getBookNTHU(searchText, type) {
         url+="/ISBN?searchText=";
     else
         url+="/book?searchText=";
-    url+=searchText;
+    url+=encodeURIComponent(searchText);
 
     console.log(`Making GET request to: ${url}`);
 
