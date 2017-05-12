@@ -40,7 +40,7 @@ export function getBookNTHU(searchText, type) {
         while (idx!==-1) {
             result[i] = {};
 
-            /* Get title */
+            /* Get title, Expected format: var title = '...'; */
             let subStr = '', j;
             data = data.slice(idx+titleFlag.length+1); // Bad efficiency...
             for (j=0; j<data.length; j++) {
@@ -60,7 +60,7 @@ export function getBookNTHU(searchText, type) {
             result[i]['bookName'] = subStr;
             //console.log("BookName =",subStr);
 
-            /* Get author */
+            /* Get author, Expected format: <td   width=\"15%\" valign=top>....<td/> */
             subStr=''
             j = data.indexOf(authorFlag)+authorFlag.length;
             for (; j<data.length; j++) {
@@ -76,7 +76,7 @@ export function getBookNTHU(searchText, type) {
             result[i]['author'] = subStr;
             //console.log("Author =",subStr);
 
-            /* Get location */
+            /* Get location, Expected format: <a sub_library=NTHU>....<a/> */
             subStr='';
             j = data.indexOf(locationFlag)+locationFlag.length;
             for (; j<data.length && data.charAt(j)!=='>'; j++);
