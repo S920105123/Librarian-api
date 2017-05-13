@@ -2,18 +2,18 @@ import axios from 'axios';
 import uuid from 'uuid/v4';
 
 // Develop server URL
-const BaseUrl = 'http://localhost:8080/api/NTHU';
+const BaseUrl = 'http://localhost:8080/api/NCTU';
 
 // Staging server URL
 // const BaseUrl = 'http://weathermood-staging.us-west-2.elasticbeanstalk.com/api/NTHU';
 
-export function getBookNTHU(searchText, type) {
+export function getBookNCTU(searchText, type) {
     // For test
     //type=0;
     //searchText='123';
 
     if (!searchText || !searchText.trim()) {
-        console.error("(NTHU) Error getting book - searchText cannot be empty.");
+        console.error("(NCTU) Error getting book - searchText cannot be empty.");
         return;
     }
     let url = `${BaseUrl}`;
@@ -30,7 +30,7 @@ export function getBookNTHU(searchText, type) {
             throw new Error(`Unexpected response code: ${res.status}`);
 
         const titleFlag = "var title = "
-        const authorFlag = "<td   width=\"15%\" valign=top>";
+        const authorFlag = "<td class=td1  width="15%" valign=top>";
         const locationFlag = "sub_library=";
 
         let data = res.data.html, result=[];
@@ -61,7 +61,7 @@ export function getBookNTHU(searchText, type) {
             result[i]['bookName'] = subStr;
             //console.log("BookName =",subStr);
 
-            /* Get author, Expected format: <td   width=\"15%\" valign=top>....<td/> */
+            /* Get author, Expected format: <td class=td1  width="15%" valign=top>....<td/> */
             subStr=''
             j = data.indexOf(authorFlag)+authorFlag.length;
             for (; j<data.length; j++) {
@@ -98,7 +98,7 @@ export function getBookNTHU(searchText, type) {
                 result[i]['status'] = "館藏/借出 - " + subStr.slice(temp);
                 subStr = subStr.slice(0,temp);
             }
-            result[i]['location'] = "國立清華大學圖書館 - "+subStr;
+            result[i]['location'] = "國立交通大學圖書館 - "+subStr;
             //console.log("Location =",subStr);
 
             idx = data.indexOf(titleFlag);
@@ -123,7 +123,7 @@ export function getBookNTHU(searchText, type) {
                     result[i+1]['status'] = "館藏/借出 - " + subStr.slice(temp);
                     subStr = subStr.slice(0,temp-1);
                 }
-                result[i+1]['location'] = "國立清華大學圖書館 - "+subStr;
+                result[i+1]['location'] = "國立交通大學圖書館 - "+subStr;
                 i++;
                 //console.log("Location =",subStr);
             }
@@ -134,7 +134,7 @@ export function getBookNTHU(searchText, type) {
         let temp = {
             data: result
         };
-        console.log("NTHU result:");
+        console.log("NCTU result:");
         console.log(temp);
 
         return temp;
