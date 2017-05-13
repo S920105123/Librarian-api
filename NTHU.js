@@ -146,7 +146,7 @@ function strTrim(str) {
     while (remove) {
         remove=false;
         for (let c of banlist) {
-            if (str && str[-1]) {
+            if (str && str[str.length-1]===c) {
                 str = str.slice(0,-1);
                 remove=true;
             }
