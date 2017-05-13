@@ -38,7 +38,9 @@ export function getBookNTHU(searchText, type) {
         let i=0;
         let idx = data.indexOf(titleFlag);
         while (idx!==-1) {
-            result[i] = {};
+            result[i] = {
+                id: uuid()
+            };
 
             /* Get title, Expected format: var title = '...'; */
             let subStr = '', j;
@@ -55,8 +57,7 @@ export function getBookNTHU(searchText, type) {
                 }
                 subStr+=c;
             }
-            if (subStr[subStr.length-1]==="/")
-                subStr = subStr.slice(0,subStr.length-2); // Skip the trailing '/'
+            subStr=strTrim(subStr);
             result[i]['bookName'] = subStr;
             //console.log("BookName =",subStr);
 
@@ -73,6 +74,7 @@ export function getBookNTHU(searchText, type) {
             }
             if (subStr[0]==='/')
                 subStr = subStr.slice(1);
+            subStr=strTrim(subStr);
             result[i]['author'] = subStr;
             //console.log("Author =",subStr);
 
@@ -88,10 +90,10 @@ export function getBookNTHU(searchText, type) {
 
             let temp = subStr.indexOf("(");
             if (temp!=-1) {
-                result[i]['status'] = ["館藏/借出 - " + subStr.slice(temp)];
+                result[i]['status'] = "館藏/借出 - " + subStr.slice(temp);
                 subStr = subStr.slice(0,temp);
             }
-            result[i]['location'] = ["清華大學圖書館 - "+subStr];
+            result[i]['location'] = "國立清華大學圖書館 - "+subStr;
             //console.log("Location =",subStr);
 
             idx = data.indexOf(titleFlag);
@@ -99,6 +101,11 @@ export function getBookNTHU(searchText, type) {
             if (j!==-1 && idx!==-1 && j<idx) {
                 /* Special case: Two location */
                 subStr='';
+                result[i] = {
+                    id: uuid(),
+                    bookName: result[i].bookName,
+                    author: result[i].author,
+                };
                 for (; j<data.length && data.charAt(j)!=='>'; j++);
                 j++;
                 while (data.charAt(j)!=='<') {
@@ -108,14 +115,14 @@ export function getBookNTHU(searchText, type) {
 
                 temp = subStr.indexOf("(");
                 if (temp!=-1) {
-                    result[i]['status'].push("館藏/借出 - " + subStr.slice(temp));
+                    result[i+1]['status'] = "館藏/借出 - " + subStr.slice(temp);
                     subStr = subStr.slice(0,temp-1);
                 }
-                result[i]['location'].push("清華大學圖書館 - "+subStr);
+                result[i+1]['location'] = "國立清華大學圖書館 - "+subStr;
+                i++;
                 //console.log("Location =",subStr);
             }
 
-            result[i]['id'] = uuid();
             i++;
         }
 
@@ -127,4 +134,18 @@ export function getBookNTHU(searchText, type) {
 
         return temp;
     });
+}
+
+function strTrim(str) {
+    let banlist = ['/', ';', ':', ' '], remove=true;
+    while (remove) {
+        remove=false;
+        for (let c of banlist) {
+            if (str && str[-1]) {
+                str = str.slice(0,-1);
+                remove=true;
+            }
+        }
+    }
+    return str;
 }
