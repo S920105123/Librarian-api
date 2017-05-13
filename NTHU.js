@@ -80,7 +80,12 @@ export function getBookNTHU(searchText, type) {
 
             /* Get location, Expected format: <a sub_library=NTHU>....<a/> */
             subStr='';
+            idx = data.indexOf(titleFlag);
             j = data.indexOf(locationFlag)+locationFlag.length;
+            if (j===-1 || (idx!==-1 && j>idx)) {
+                // NTHU library does not have this book, filter it.
+                continue;
+            }
             for (; j<data.length && data.charAt(j)!=='>'; j++);
             j++;
             while (data.charAt(j)!=='<') {
@@ -137,7 +142,7 @@ export function getBookNTHU(searchText, type) {
 }
 
 function strTrim(str) {
-    let banlist = ['/', ';', ':', ' '], remove=true;
+    let banlist = ['/', ';', ':', ' ', ','], remove=true;
     while (remove) {
         remove=false;
         for (let c of banlist) {
