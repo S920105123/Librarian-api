@@ -13,7 +13,7 @@ export function getBookNCTU(searchText, type) {
     //searchText='123';
 
     if (!searchText || !searchText.trim()) {
-        console.error("(NCTU) Error getting book - searchText cannot be empty.");
+        console.error("(NTHU) Error getting book - searchText cannot be empty.");
         return;
     }
     let url = `${BaseUrl}`;
@@ -30,7 +30,7 @@ export function getBookNCTU(searchText, type) {
             throw new Error(`Unexpected response code: ${res.status}`);
 
         const titleFlag = "var title = "
-        const authorFlag = "<td class=td1  width="15%" valign=top>";
+        const authorFlag = "<td class=td1  width=\"15%\" valign=top>";
         const locationFlag = "sub_library=";
 
         let data = res.data.html, result=[];
@@ -45,6 +45,7 @@ export function getBookNCTU(searchText, type) {
             /* Get title, Expected format: var title = '...'; */
             let subStr = '', j;
             data = data.slice(idx+titleFlag.length+1); // Bad efficiency...
+            let next = data.indexOf(titleFlag);
             for (j=0; j<data.length; j++) {
                 // Filter special char.
                 let c = data.charAt(j);
@@ -61,29 +62,33 @@ export function getBookNCTU(searchText, type) {
             result[i]['bookName'] = subStr;
             //console.log("BookName =",subStr);
 
-            /* Get author, Expected format: <td class=td1  width="15%" valign=top>....<td/> */
+            /* Get author, Expected format: <td   width=\"15%\" valign=top>....<td/> */
             subStr=''
-            j = data.indexOf(authorFlag)+authorFlag.length;
-            for (; j<data.length; j++) {
-                // Filter special char.
-                let c = data.charAt(j);
-                if (c==='<') {
-                    break;
+            j = data.indexOf(authorFlag);
+            if (j!==-1 && !(next!==-1 && j>next)) {
+                j+=authorFlag.length;
+                for (; j<data.length; j++) {
+                    // Filter special char.
+                    let c = data.charAt(j);
+                    if (c==='<') {
+                        break;
+                    }
+                    subStr+=c;
                 }
-                subStr+=c;
+                if (subStr[0]==='/')
+                    subStr = subStr.slice(1);
+                subStr=strTrim(subStr);
+                result[i]['author'] = subStr;
+                //console.log("Author =",subStr);
             }
-            if (subStr[0]==='/')
-                subStr = subStr.slice(1);
-            subStr=strTrim(subStr);
-            result[i]['author'] = subStr;
-            //console.log("Author =",subStr);
 
             /* Get location, Expected format: <a sub_library=NTHU>....<a/> */
             subStr='';
-            idx = data.indexOf(titleFlag);
-            j = data.indexOf(locationFlag)+locationFlag.length;
-            if (j===-1 || (idx!==-1 && j>idx)) {
-                // NTHU library does not have this book, filter it.
+            j = data.indexOf(locationFlag);
+            if (j===-1 || (next!==-1 && j>next)) {
+                // Library does not have this book, filter it.
+                idx=next;
+                result.pop();
                 continue;
             }
             for (; j<data.length && data.charAt(j)!=='>'; j++);
@@ -101,12 +106,11 @@ export function getBookNCTU(searchText, type) {
             result[i]['location'] = "國立交通大學圖書館 - "+subStr;
             //console.log("Location =",subStr);
 
-            idx = data.indexOf(titleFlag);
-            j = data.indexOf(locationFlag,j)+locationFlag.length;
-            if (j!==-1 && idx!==-1 && j<idx) {
+            j = data.indexOf(locationFlag,j);
+            if (j!==-1 && next!==-1 && j<next) {
                 /* Special case: Two location */
                 subStr='';
-                result[i] = {
+                result[i+1] = {
                     id: uuid(),
                     bookName: result[i].bookName,
                     author: result[i].author,
@@ -129,6 +133,7 @@ export function getBookNCTU(searchText, type) {
             }
 
             i++;
+            idx=next;
         }
 
         let temp = {
@@ -152,5 +157,12 @@ function strTrim(str) {
             }
         }
     }
+
+    let idx=str.indexOf("&nbsp;");
+    while (idx!==-1) {
+        str = str.slice(0,idx) + ' ' + str.slice(idx+6);
+        idx=str.indexOf("&nbsp;");
+    }
+
     return str;
 }
