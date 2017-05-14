@@ -7,6 +7,37 @@ const BaseUrl = 'http://localhost:8080/api/NTHU';
 // Staging server URL
 // const BaseUrl = 'http://weathermood-staging.us-west-2.elasticbeanstalk.com/api/NTHU';
 
+function strTrim(str) {
+    let banlist = ['/', ';', ':', ' ', ','], remove=true;
+    while (remove) {
+        remove=false;
+        for (let c of banlist) {
+            if (str && str[str.length-1]===c) {
+                str = str.slice(0,-1);
+                remove=true;
+            }
+        }
+    }
+
+    let idx=str.indexOf("&nbsp;");
+    while (idx!==-1) {
+        str = str.slice(0,idx) + ' ' + str.slice(idx+6);
+        idx=str.indexOf("&nbsp;");
+    }
+
+    return str;
+}
+
+function filterDash(str) {
+    let result=''
+    for (let i=0; i<str.length; i++) {
+        if (str[i]!=='-') {
+            result+=str[i];
+        }
+    }
+    return result;
+}
+
 export function getBookNTHU(searchText, type) {
     // For test
     //type=0;
@@ -17,10 +48,12 @@ export function getBookNTHU(searchText, type) {
         return;
     }
     let url = `${BaseUrl}`;
-    if (type==="isbn")
+    if (type==="isbn") {
         url+="/ISBN?searchText=";
-    else
+        searchText=filterDash(searchText);
+    } else {
         url+="/book?searchText=";
+    }
     url+=encodeURIComponent(searchText);
 
     console.log(`Making GET request to: ${url}`);
@@ -144,25 +177,4 @@ export function getBookNTHU(searchText, type) {
 
         return temp;
     });
-}
-
-function strTrim(str) {
-    let banlist = ['/', ';', ':', ' ', ','], remove=true;
-    while (remove) {
-        remove=false;
-        for (let c of banlist) {
-            if (str && str[str.length-1]===c) {
-                str = str.slice(0,-1);
-                remove=true;
-            }
-        }
-    }
-
-    let idx=str.indexOf("&nbsp;");
-    while (idx!==-1) {
-        str = str.slice(0,idx) + ' ' + str.slice(idx+6);
-        idx=str.indexOf("&nbsp;");
-    }
-
-    return str;
 }
