@@ -158,7 +158,7 @@ export function getBookNTHU(searchText, type) {
                 temp = subStr.indexOf("(");
                 if (temp!=-1) {
                     result[i+1]['status'] = "館藏/借出 - " + subStr.slice(temp);
-                    subStr = subStr.slice(0,temp-1);
+                    subStr = subStr.slice(0,temp);
                 }
                 result[i+1]['location'] = "國立清華大學圖書館 - "+subStr;
                 i++;
